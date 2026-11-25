@@ -11,6 +11,8 @@ from pathlib import Path
 
 LINE = "I tried to teach my dog fetch, but he unionized the squirrels instead."
 
+MAX_LENGTH = 140
+
 OUTPUT = Path("/output/entry.txt")
 
 
@@ -23,8 +25,11 @@ def main() -> int:
     if "\n" in text or "\r" in text:
         print("FAIL: entry is not a single line", file=sys.stderr)
         return 1
-    if not 1 <= len(text) <= 140:
-        print(f"FAIL: entry length {len(text)} is outside 1-140", file=sys.stderr)
+    if any(ord(ch) < 32 or ord(ch) == 127 for ch in text):
+        print("FAIL: entry contains a control character", file=sys.stderr)
+        return 1
+    if not 1 <= len(text) <= MAX_LENGTH:
+        print(f"FAIL: entry length {len(text)} is outside 1-{MAX_LENGTH}", file=sys.stderr)
         return 1
     if not text.strip():
         print("FAIL: entry is only whitespace", file=sys.stderr)
